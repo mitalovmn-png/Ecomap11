@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мониторинг пунктов приема ХИТ — Санкт-Петербург</title>
-    <!-- Подключение API Яндекс Карт -->
-    <script src="https://yandex.ru" type="text/javascript"></script>
     <style>
         :root {
             --primary: #2e7d32;
@@ -49,7 +47,7 @@
             margin: 20px auto;
             padding: 0 15px;
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
             flex: 1;
         }
@@ -79,11 +77,6 @@
         .point-item {
             padding: 12px;
             border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .point-item:hover {
-            background-color: #f1f8e9;
         }
         .point-item:last-child {
             border-bottom: none;
@@ -102,16 +95,36 @@
             margin-top: 6px;
             font-weight: 600;
         }
-        #map-container {
-            position: relative;
-            height: 600px;
+        .map-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--card-bg);
+            padding: 40px 20px;
             border-radius: 8px;
-            overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 2px dashed #a5d6a7;
         }
-        #map {
-            width: 100%;
-            height: 100%;
+        .map-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .map-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .map-btn:active {
+            transform: translateY(0);
         }
         footer {
             background: #333;
@@ -137,104 +150,43 @@
             <p style="font-size: 13px; margin-bottom: 8px;"><strong>Городские Экопункты:</strong> Принимают любые типы батареек и емкие свинцово-кислотные аккумуляторы от населения.</p>
             <p style="font-size: 13px;"><strong>Сетевые Экобоксы:</strong> Рассчитаны строго на сбор малогабаритных солевых и щелочных источников питания.</p>
         </div>
-        <div class="card" style="flex: 1; overflow-y: auto; max-height: 420px;">
+        <div class="card">
             <h2>Список доступных точек</h2>
-            <div id="points-list"></div>
+            <div id="points-list">
+                <div class="point-item">
+                    <div class="point-name">Городской стационарный Экопункт ВО</div>
+                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Васильевский остров, Наличная улица, дом 32</div>
+                    <span class="point-type">Экопункт</span>
+                </div>
+                <div class="point-item">
+                    <div class="point-name">Городской стационарный Экопункт Московский</div>
+                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Площадь Конституции, дом 1</div>
+                    <span class="point-type">Экопункт</span>
+                </div>
+                <div class="point-item">
+                    <div class="point-name">Контейнер сбора ВкусВилл Центральный</div>
+                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Невский проспект, дом 120</div>
+                    <span class="point-type">Сетевой экобокс</span>
+                </div>
+                <div class="point-item">
+                    <div class="point-name">Пункт сбора Лента Приморский</div>
+                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Улица Савушкина, дом 112</div>
+                    <span class="point-type">Сетевой экобокс</span>
+                </div>
+            </div>
         </div>
     </div>
     
-    <div id="map-container">
-        <div id="map"></div>
+    <div class="map-card">
+        <h2 style="color: var(--primary-dark); font-size: 20px; margin-bottom: 10px;">Географическая визуализация точек сбора</h2>
+        <p style="font-size: 14px; color: #555; max-width: 400px;">Для перехода к интерактивной карте города Санкт-Петербурга с нанесенными экопунктами и сетевыми экобоксами нажмите на кнопку ниже:</p>
+        <a href="https://yandex.ru" target="_blank" class="map-btn">Открыть интерактивную карту</a>
     </div>
 </div>
 
 <footer>
-    <p>© Практическая часть научно-исследовательской работы. Интеграция выполнена на базе API Яндекс Карт.</p>
+    <p>© Практическая часть научно-исследовательской работы. Интеграция выполнена на базе геосервиса Яндекс Карты.</p>
 </footer>
 
-<script type="text/javascript">
-    // База данных пунктов сбора
-    const points = [
-        {
-            name: "Городской стационарный Экопункт ВО",
-            lat: 59.9415,
-            lng: 30.2335,
-            address: "Васильевский остров, Наличная улица, дом 32",
-            type: "Экопункт",
-            desc: "Прием любых ХИТ, включая свинец, литий и кадмий"
-        },
-        {
-            name: "Городской стационарный Экопункт Московский",
-            lat: 59.8512,
-            lng: 30.3218,
-            address: "Площадь Конституции, дом 1",
-            type: "Экопункт",
-            desc: "Централизованный прием бытовых и автомобильных аккумуляторов"
-        },
-        {
-            name: "Контейнер сбора ВкусВилл Центральный",
-            lat: 59.9322,
-            lng: 30.3601,
-            address: "Невский проспект, дом 120",
-            type: "Сетевой экобокс",
-            desc: "Ограничение: только малогабаритные бытовые батарейки"
-        },
-        {
-            name: "Пункт сбора Лента Приморский",
-            lat: 59.9892,
-            lng: 30.2241,
-            address: "Улица Савушкина, дом 112",
-            type: "Сетевой экобокс",
-            desc: "Специализированный контейнер для солевых и щелочных элементов"
-        }
-    ];
-
-    // Ожидание загрузки API Яндекс Карт
-    ymaps.ready(init);
-
-    function init() {
-        // Создание карты с центром в СПб
-        const myMap = new ymaps.Map("map", {
-            center: [59.9343, 30.3351],
-            zoom: 11,
-            controls: ['zoomControl', 'fullscreenControl']
-        });
-
-        const listContainer = document.getElementById('points-list');
-
-        points.forEach((point) => {
-            // Создание метки на Яндекс Картах
-            const myPlacemark = new ymaps.Placemark([point.lat, point.lng], {
-                balloonContentHeader: point.name,
-                balloonContentBody: `${point.address}<br><br><i style="color:#555;">${point.desc}</i>`,
-                hintContent: point.name
-            }, {
-                preset: point.type === "Экопункт" ? 'islands#greenCircleDotIcon' : 'islands#blueCircleDotIcon'
-            });
-
-            myMap.geoObjects.add(myPlacemark);
-
-            // Создание элемента боковой панели
-            const item = document.createElement('div');
-            item.className = 'point-item';
-            item.innerHTML = `
-                <div class="point-name">${point.name}</div>
-                <div style="font-size: 12px; color: #555; margin-top: 2px;">${point.address}</div>
-                <span class="point-type">${point.type}</span>
-            `;
-
-            // Обработка клика по списку
-            item.addEventListener('click', () => {
-                myMap.setCenter([point.lat, point.lng], 14, {
-                    checkZoomRange: true,
-                    duration: 300
-                });
-                myPlacemark.balloon.open();
-            });
-
-            listContainer.appendChild(item);
-        });
-    }
-</script>
 </body>
 </html>
