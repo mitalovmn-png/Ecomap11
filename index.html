@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мониторинг пунктов приема ХИТ — Санкт-Петербург</title>
+    <!-- Подключение API Яндекс Карт -->
+    <script src="https://yandex.ru" type="text/javascript"></script>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --bg: #f8f9fa;
+            --text: #212529;
+            --card-bg: #ffffff;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            flex: 1;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            border-bottom: 2px solid #e8f5e9;
+            padding-bottom: 5px;
+        }
+        .point-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .point-item:hover {
+            background-color: #f1f8e9;
+        }
+        .point-item:last-child {
+            border-bottom: none;
+        }
+        .point-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .point-type {
+            font-size: 11px;
+            color: #2e7d32;
+            display: inline-block;
+            background: #e8f5e9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+        #map-container {
+            position: relative;
+            height: 600px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Интерактивная карта пунктов приема ХИТ</h1>
+    <p>Практическая часть исследования рисков загрязнения окружающей среды тяжелыми металлами</p>
+</header>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="card">
+            <h2>Классификация пунктов</h2>
+            <p style="font-size: 13px; margin-bottom: 8px;"><strong>Городские Экопункты:</strong> Принимают любые типы батареек и емкие свинцово-кислотные аккумуляторы от населения.</p>
+            <p style="font-size: 13px;"><strong>Сетевые Экобоксы:</strong> Рассчитаны строго на сбор малогабаритных солевых и щелочных источников питания.</p>
+        </div>
+        <div class="card" style="flex: 1; overflow-y: auto; max-height: 420px;">
+            <h2>Список доступных точек</h2>
+            <div id="points-list"></div>
+        </div>
+    </div>
+    
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+</div>
+
+<footer>
+    <p>© Практическая часть научно-исследовательской работы. Интеграция выполнена на базе API Яндекс Карт.</p>
+</footer>
+
+<script type="text/javascript">
+    // База данных пунктов сбора
+    const points = [
+        {
+            name: "Городской стационарный Экопункт ВО",
+            lat: 59.9415,
+            lng: 30.2335,
+            address: "Васильевский остров, Наличная улица, дом 32",
+            type: "Экопункт",
+            desc: "Прием любых ХИТ, включая свинец, литий и кадмий"
+        },
+        {
+            name: "Городской стационарный Экопункт Московский",
+            lat: 59.8512,
+            lng: 30.3218,
+            address: "Площадь Конституции, дом 1",
+            type: "Экопункт",
+            desc: "Централизованный прием бытовых и автомобильных аккумуляторов"
+        },
+        {
+            name: "Контейнер сбора ВкусВилл Центральный",
+            lat: 59.9322,
+            lng: 30.3601,
+            address: "Невский проспект, дом 120",
+            type: "Сетевой экобокс",
+            desc: "Ограничение: только малогабаритные бытовые батарейки"
+        },
+        {
+            name: "Пункт сбора Лента Приморский",
+            lat: 59.9892,
+            lng: 30.2241,
+            address: "Улица Савушкина, дом 112",
+            type: "Сетевой экобокс",
+            desc: "Специализированный контейнер для солевых и щелочных элементов"
+        }
+    ];
+
+    // Ожидание загрузки API Яндекс Карт
+    ymaps.ready(init);
+
+    function init() {
+        // Создание карты с центром в СПб
+        const myMap = new ymaps.Map("map", {
+            center: [59.9343, 30.3351],
+            zoom: 11,
+            controls: ['zoomControl', 'fullscreenControl']
+        });
+
+        const listContainer = document.getElementById('points-list');
+
+        points.forEach((point) => {
+            // Создание метки на Яндекс Картах
+            const myPlacemark = new ymaps.Placemark([point.lat, point.lng], {
+                balloonContentHeader: point.name,
+                balloonContentBody: `${point.address}<br><br><i style="color:#555;">${point.desc}</i>`,
+                hintContent: point.name
+            }, {
+                preset: point.type === "Экопункт" ? 'islands#greenCircleDotIcon' : 'islands#blueCircleDotIcon'
+            });
+
+            myMap.geoObjects.add(myPlacemark);
+
+            // Создание элемента боковой панели
+            const item = document.createElement('div');
+            item.className = 'point-item';
+            item.innerHTML = `
+                <div class="point-name">${point.name}</div>
+                <div style="font-size: 12px; color: #555; margin-top: 2px;">${point.address}</div>
+                <span class="point-type">${point.type}</span>
+            `;
+
+            // Обработка клика по списку
+            item.addEventListener('click', () => {
+                myMap.setCenter([point.lat, point.lng], 14, {
+                    checkZoomRange: true,
+                    duration: 300
+                });
+                myPlacemark.balloon.open();
+            });
+
+            listContainer.appendChild(item);
+        });
+    }
+</script>
+</body>
+</html>
