@@ -1,192 +1,491 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мониторинг пунктов приема ХИТ — Санкт-Петербург</title>
-    <style>
-        :root {
-            --primary: #2e7d32;
-            --primary-dark: #1b5e20;
-            --bg: #f8f9fa;
-            --text: #212529;
-            --card-bg: #ffffff;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        }
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 20px auto;
-            padding: 0 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            flex: 1;
-        }
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .card h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: var(--primary-dark);
-            border-bottom: 2px solid #e8f5e9;
-            padding-bottom: 5px;
-        }
-        .point-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-        .point-item:last-child {
-            border-bottom: none;
-        }
-        .point-name {
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .point-type {
-            font-size: 11px;
-            color: #2e7d32;
-            display: inline-block;
-            background: #e8f5e9;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-top: 6px;
-            font-weight: 600;
-        }
-        .map-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: var(--card-bg);
-            padding: 40px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 2px dashed #a5d6a7;
-        }
-        .map-btn {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            padding: 15px 30px;
-            border-radius: 6px;
-            font-weight: bold;
-            margin-top: 20px;
-            transition: background 0.2s, transform 0.1s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .map-btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-        .map-btn:active {
-            transform: translateY(0);
-        }
-        footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 15px;
-            font-size: 12px;
-            margin-top: auto;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пункты сбора батареек и аккумуляторов — Санкт-Петербург</title>
+<meta name="description" content="Интерактивная карта на Яндекс.Картах: пункты приёма батареек и аккумуляторов по Санкт-Петербургу.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔋</text></svg>">
+<style>
+  :root{
+    --green:#2e7d4f; --green-dark:#1f5c3a; --accent:#f4a300;
+    --bg:#f5f7f6; --card:#ffffff; --text:#1c2b24; --muted:#5f6f66; --border:#dde5e0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+
+  header{background:var(--green);color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+  header .logo{font-size:1.6rem}
+  header h1{font-size:1.05rem;font-weight:600;line-height:1.3}
+  header h1 small{display:block;font-weight:400;font-size:.78rem;opacity:.85}
+
+  .banner{display:none;align-items:center;gap:10px;background:#fff4e0;border:1px solid #f0c983;color:#7a5200;padding:10px 16px;font-size:.88rem}
+  .banner button{background:#f4a300;border:none;color:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:.85rem;white-space:nowrap}
+  .banner button:hover{background:#d68d00}
+
+  .layout{flex:1;display:flex;min-height:0}
+
+  /* ---- Sidebar ---- */
+  .sidebar{width:340px;min-width:280px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column}
+  .side-top{padding:12px 14px;border-bottom:1px solid var(--border)}
+  .search{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:.95rem;background:var(--bg)}
+  .search:focus{outline:2px solid var(--green);border-color:transparent}
+  .filters{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .chip{cursor:pointer;border:1px solid var(--border);background:var(--bg);border-radius:20px;padding:6px 12px;font-size:.85rem;user-select:none;transition:.15s}
+  .chip.active{background:var(--green);border-color:var(--green);color:#fff}
+  .counter{margin-top:10px;font-size:.8rem;color:var(--muted)}
+
+  .list{flex:1;overflow-y:auto;padding:8px}
+  .point-card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:6px 4px;cursor:pointer;transition:.15s;background:#fff}
+  .point-card:hover,.point-card.selected{border-color:var(--green);box-shadow:0 2px 8px rgba(46,125,79,.15)}
+  .point-card h3{font-size:.93rem;display:flex;align-items:center;gap:6px}
+  .point-card .addr{font-size:.82rem;color:var(--muted);margin-top:3px}
+  .tags{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+  .tag{font-size:.72rem;padding:2px 8px;border-radius:10px;background:#e8f2ec;color:var(--green-dark);white-space:nowrap}
+  .tag.acc{background:#fff2dd;color:#8a5a00}
+  .empty{padding:30px 10px;text-align:center;color:var(--muted);font-size:.85rem}
+
+  .side-note{padding:10px 14px;border-top:1px solid var(--border);font-size:.75rem;color:var(--muted)}
+  .side-note a{color:var(--green)}
+
+  /* ---- Map ---- */
+  .map-wrap{flex:1;position:relative}
+  #map{position:absolute;inset:0}
+  .map-btns{position:absolute;top:14px;right:14px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+  .map-btn{width:42px;height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:1.2rem;box-shadow:0 2px 6px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center}
+  .map-btn:hover{background:#eef5f0}
+
+  .legend{position:absolute;left:12px;bottom:12px;z-index:1600;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.2);padding:8px 12px;font-size:.8rem;line-height:1.7}
+  .dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:2px solid #fff;box-shadow:0 0 2px rgba(0,0,0,.4)}
+
+  .ymaps-hint{filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
+
+  .burger{display:none;margin-left:auto;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
+
+  @media (max-width:820px){
+    .layout{position:relative}
+    .sidebar{position:absolute;inset:0;z-index:3000;width:100%;max-width:400px;transform:translateX(-105%);transition:.25s;box-shadow:4px 0 20px rgba(0,0,0,.25)}
+    .sidebar.open{transform:translateX(0)}
+    .burger{display:block}
+    .close-side{display:block}
+    .legend{display:none}
+  }
+  .close-side{display:none;position:absolute;top:8px;right:10px;z-index:3001;background:none;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer}
+</style>
 </head>
 <body>
 
 <header>
-    <h1>Интерактивная карта пунктов приема ХИТ</h1>
-    <p>Практическая часть исследования рисков загрязнения окружающей среды тяжелыми металлами</p>
+  <button class="burger" id="burger" aria-label="Открыть список">&#9776;</button>
+  <span class="logo">🔋</span>
+  <h1>Пункты сбора батареек и аккумуляторов<small>Санкт-Петербург · Яндекс.Карты</small></h1>
 </header>
 
-<div class="container">
-    <div class="sidebar">
-        <div class="card">
-            <h2>Классификация пунктов</h2>
-            <p style="font-size: 13px; margin-bottom: 8px;"><strong>Городские Экопункты:</strong> Принимают любые типы батареек и емкие свинцово-кислотные аккумуляторы от населения.</p>
-            <p style="font-size: 13px;"><strong>Сетевые Экобоксы:</strong> Рассчитаны строго на сбор малогабаритных солевых и щелочных источников питания.</p>
-        </div>
-        <div class="card">
-            <h2>Список доступных точек</h2>
-            <div id="points-list">
-                <div class="point-item">
-                    <div class="point-name">Городской стационарный Экопункт ВО</div>
-                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Васильевский остров, Наличная улица, дом 32</div>
-                    <span class="point-type">Экопункт</span>
-                </div>
-                <div class="point-item">
-                    <div class="point-name">Городской стационарный Экопункт Московский</div>
-                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Площадь Конституции, дом 1</div>
-                    <span class="point-type">Экопункт</span>
-                </div>
-                <div class="point-item">
-                    <div class="point-name">Контейнер сбора ВкусВилл Центральный</div>
-                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Невский проспект, дом 120</div>
-                    <span class="point-type">Сетевой экобокс</span>
-                </div>
-                <div class="point-item">
-                    <div class="point-name">Пункт сбора Лента Приморский</div>
-                    <div style="font-size: 12px; color: #555; margin-top: 2px;">Улица Савушкина, дом 112</div>
-                    <span class="point-type">Сетевой экобокс</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="map-card">
-        <h2 style="color: var(--primary-dark); font-size: 20px; margin-bottom: 10px;">Географическая визуализация точек сбора</h2>
-        <p style="font-size: 14px; color: #555; max-width: 400px;">Для перехода к интерактивной карте города Санкт-Петербурга с нанесенными экопунктами и сетевыми экобоксами нажмите на кнопку ниже:</p>
-        <a href="https://yandex.com" target="_blank" class="map-btn">Открыть интерактивную карту</a>
-    </div>
+<div class="banner" id="keyBanner">
+  🔑 Чтобы карта заработала, нужен бесплатный API-ключ Яндекс.Карт:
+  <b>1)</b> зарегистрируйтесь на <a href="https://developer.tech.yandex.ru/" target="_blank" rel="noopener" style="color:inherit">developer.tech.yandex.ru</a>
+  <b>2)</b> создайте ключ «JavaScript API и HTTP Геокодер»
+  <b>3)</b> вставьте его в <code>index.html</code> в строку <code>const YANDEX_API_KEY = ""</code>.
+  <button onclick="document.getElementById('keyBanner').style.display='none'">Понятно</button>
 </div>
 
-<footer>
-    <p>© Практическая часть научно-исследовательской работы. Интеграция выполнена на базе геосервиса Яндекс Карты.</p>
-</footer>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <button class="close-side" id="closeSide" aria-label="Закрыть список">&#10005;</button>
+    <div class="side-top">
+      <input type="search" class="search" id="search" placeholder="Поиск по адресу или названию…">
+      <div class="filters">
+        <span class="chip active" data-f="all">Все</span>
+        <span class="chip" data-f="battery">🔋 Батарейки</span>
+        <span class="chip" data-f="accumulator">🚗 Аккумуляторы</span>
+      </div>
+      <div class="counter" id="counter"></div>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="side-note">
+      Данные носят справочный характер — перед визитом проверьте актуальность пункта.
+      Карта предоставляется сервисом &copy; <a href="https://yandex.ru/maps/" target="_blank" rel="noopener">Яндекс.Карты</a>.
+    </div>
+  </aside>
 
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="map-btns">
+      <button class="map-btn" id="fitBtn" title="Показать все пункты">🗺️</button>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:#2e7d4f"></span>Батарейки</span><br>
+      <span><span class="dot" style="background:#f4a300"></span>Аккумуляторы</span><br>
+      <span><span class="dot" style="background:#1565c0"></span>Батарейки и аккумуляторы</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Например ключ храните здесь. Получить: https://developer.tech.yandex.ru/services/ */
+const YANDEX_API_KEY = "fc1931a0-cd4e-432a-8cc9-c9ed8268950f"; // ключ Яндекс.Карт
+
+/* ================================================================
+   СПИСОК ПУНКТОВ СБОРА — редактируйте этот массив.
+   type: "battery" — батарейки; "accumulator" — аккумуляторы; "both" — оба.
+   lat/lng — координаты (взять можно в Яндекс.Картах: ПКМ по месту).
+   ================================================================ */
+const POINTS = [
+  { name: "Гипер «Лента»",
+    addr: "пр. Савушкина, 112 (Приморский)", type:"both",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер для батареек у входа.",
+    lat:59.984637, lng:30.2261724 },
+  { name: "«Лента»",
+    addr: "пр. Энергетиков, 59 (Выборгский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Сброс батареек — у стойки информации.",
+    lat:59.9723864, lng:30.4381599 },
+  { name: "Гипер «Лента»",
+    addr: "Дальневосточный пр., 16 (Невский)", type:"both",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер у входа/на кассовой зоне.",
+    lat:59.9098435, lng:30.4493859 },
+  { name: "ТРК (Пулковский меридиан)",
+    addr: "Пулковское ш., 60 (Московский)", type:"both",
+    hours: "Ежедневно 10:00–22:00", note: "Батарейки — контейнер на фуд-корте, АКБ — уточняйте.",
+    lat:59.7924847, lng:30.3326227 },
+  { name: "«Перекрёсток»",
+    addr: "пр. Космонавтов, 38 (Московский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-бокс у выхода из магазина.",
+    lat:59.8558817, lng:30.3555138 },
+  { name: "«Пятёрочка»",
+    addr: "пр. Культуры, 23 (Выборгский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у касс.",
+    lat:60.0468053, lng:30.3795786 },
+  { name: "ТРК «LeoMall»",
+    addr: "ул. Планерная, 59 (Приморский)", type:"both",
+    hours: "Ежедневно 10:00–22:00", note: "Батарейки — контейнер у стойки информации.",
+    lat:60.0221368, lng:30.2250566 },
+  { name: "«Дикси»",
+    addr: "ул. Дыбенко, 26 (Невский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер в зоне касс.",
+    lat:59.9074296, lng:30.4833514 },
+  { name: "«Пятёрочка»",
+    addr: "пр. Энгельса, 124 (Выборгский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Сброс батареек — у выхода.",
+    lat:60.0403311, lng:30.3246337 },
+  { name: "«Магнит»",
+    addr: "ул. Коллонтай, 41 (Невский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер у входа.",
+    lat:59.9241576, lng:30.4960253 },
+  { name: "«Пятёрочка»",
+    addr: "пр. Просвещения, 25 (Выборгский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у касс.",
+    lat:60.0514351, lng:30.3392532 },
+  { name: "«Магнит»",
+    addr: "Московское ш., 19 (Пушкинский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-бокс у информационной стойки.",
+    lat:59.7136711, lng:30.426143 },
+  { name: "ТРК «Континент»",
+    addr: "ул. Байконурская, 14 (Приморский)", type:"both",
+    hours: "Ежедневно 10:00–22:00", note: "Приём АКБ уточняйте на сайте центра.",
+    lat:60.0022252, lng:30.2726693 },
+  { name: "«Максидом»",
+    addr: "Дунайский пр., 64 (Фрунзенский)", type:"both",
+    hours: "Ежедневно 08:00–22:00", note: "Приём отработанных АКБ при замене.",
+    lat:59.8461655, lng:30.4223793 },
+  { name: "«Дикси»",
+    addr: "Гражданский пр., 114 (Калининский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у входа.",
+    lat:60.0332407, lng:30.4168142 },
+  { name: "«Перекрёсток»",
+    addr: "пр. Просвещения, 84 (Выборгский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер на выходе из магазина.",
+    lat:60.0368492, lng:30.4152844 },
+  { name: "«Пятёрочка»",
+    addr: "пр. Косыгина, 34 (Красногвардейский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Сброс батареек — у касс.",
+    lat:59.9464627, lng:30.5039187 },
+  { name: "«Магнит»",
+    addr: "Индустриальный пр., 49 (Красногвардейский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер в зоне касс.",
+    lat:59.964513, lng:30.4580958 },
+  { name: "«Дикси»",
+    addr: "Будапештская ул., 94 (Фрунзенский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у входа.",
+    lat:59.8383234, lng:30.398302 },
+  { name: "«Перекрёсток»",
+    addr: "Пражская ул., 7 (Фрунзенский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-бокс у стойки информации.",
+    lat:59.8778408, lng:30.3838533 },
+  { name: "БЦ «Сенатор»",
+    addr: "Малая Морская ул., 4/1 (Адмиралтейский)", type:"battery",
+    hours: "Пн–Пт 09:00–19:00", note: "Эко-контейнер на ресепшн.",
+    lat:59.9359381, lng:30.3148594 },
+  { name: "Торговый дом (Невский, 46)",
+    addr: "Невский пр., 46 (Центральный)", type:"battery",
+    hours: "Ежедневно 10:00–20:00", note: "Сброс батареек у входа.",
+    lat:59.9350487, lng:30.3337163 },
+  { name: "«Пятёрочка»",
+    addr: "Каменноостровский пр., 38 (Петроградский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у касс.",
+    lat:59.9655889, lng:30.3098493 },
+  { name: "«Дикси»",
+    addr: "ул. Ленина, 5 (Петроградский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер в зоне касс.",
+    lat:59.9604855, lng:30.3095235 },
+  { name: "«Перекрёсток»",
+    addr: "Московский пр., 205 (Московский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-бокс у выхода из магазина.",
+    lat:59.8468044, lng:30.3209193 },
+  { name: "«Пятёрочка»",
+    addr: "Ленинский пр., 153 (Московский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у касс.",
+    lat:59.8497862, lng:30.30249 },
+  { name: "«Магнит»",
+    addr: "Петергофский пр., 26 (Адмиралтейский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер у входа.",
+    lat:59.9064453, lng:30.2765929 },
+  { name: "БЦ «Факт»",
+    addr: "Свердловская наб., 44 (Выборгский)", type:"battery",
+    hours: "Пн–Пт 09:00–19:00", note: "Эко-контейнер для батареек на ресепшн.",
+    lat:59.961317, lng:30.4021183 },
+  { name: "«Пятёрочка»",
+    addr: "пр. Юрия Гагарина, 22 (Московский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Сброс батареек — у касс.",
+    lat:59.8574246, lng:30.3420841 },
+  { name: "«Дикси»",
+    addr: "пр. Стачек, 67 (Кировский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер у входа.",
+    lat:59.871167, lng:30.2586754 },
+  { name: "«Перекрёсток»",
+    addr: "Народная ул., 2 (Невский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у стойки.",
+    lat:59.8800339, lng:30.4571949 },
+  { name: "БЦ «Лесной»",
+    addr: "Лесной пр., 63 (Выборгский)", type:"battery",
+    hours: "Пн–Пт 09:00–19:00", note: "Эко-бокс на стойке ресепшн.",
+    lat:59.9854707, lng:30.342988 },
+  { name: "«Магнит»",
+    addr: "Б. Сампсониевский пр., 45 (Выборгский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у касс.",
+    lat:59.9696938, lng:30.3426828 },
+  { name: "«Пятёрочка»",
+    addr: "Мебельная ул., 12 (Приморский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер в зоне касс.",
+    lat:59.9884732, lng:30.2430127 },
+  { name: "«Дикси»",
+    addr: "ул. Димитрова, 24 (Фрунзенский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у входа.",
+    lat:59.8524757, lng:30.3933033 },
+  { name: "Бизнес-парк «Софийская, 14»",
+    addr: "Софийская ул., 14 (Фрунзенский)", type:"battery",
+    hours: "Пн–Пт 09:00–19:00", note: "Эко-контейнер для батареек в лобби.",
+    lat:59.8808449, lng:30.3945817 },
+  { name: "«Пятёрочка»",
+    addr: "Петергофское ш., 51 (Красносельский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Сброс батареек — у касс.",
+    lat:59.8492379, lng:30.1447977 },
+  { name: "«Пятёрочка»",
+    addr: "пр. Солидарности, 10 (Красногвардейский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер у входа.",
+    lat:59.9208612, lng:30.4938619 },
+  { name: "ТЦ (Кронштадт)",
+    addr: "Якорная пл., 3 (Кронштадт)", type:"both",
+    hours: "Ежедневно 10:00–20:00", note: "Батарейки — контейнер у входа.",
+    lat:59.9910157, lng:29.7805993 },
+  { name: "«Пятёрочка»",
+    addr: "ул. Токарева, 4 (Сестрорецк)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у касс.",
+    lat:60.0860389, lng:29.9528217 },
+  { name: "«Магнит»",
+    addr: "бульвар Трудящихся, 21 (Колпино)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер в зоне касс.",
+    lat:59.7345451, lng:30.5742206 },
+  { name: "«Дикси»",
+    addr: "Октябрьский бульвар, 10 (Пушкин)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у входа.",
+    lat:59.7255387, lng:30.40845 },
+  { name: "«Пятёрочка»",
+    addr: "Ораниенбаумский пр., 40 (Ломоносов)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-бокс на стойке информации.",
+    lat:59.895914, lng:29.7777167 },
+  { name: "Магазин (Стрельна)",
+    addr: "СПб шоссе, 81 (Стрельна)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер у касс.",
+    lat:59.8532569, lng:30.0922284 },
+  { name: "«Дикси»",
+    addr: "ул. Первого Мая (Парголово)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у входа.",
+    lat:60.0773303, lng:30.2407343 },
+  { name: "ТЦ (Шувалово-Озерки)",
+    addr: "Выборгское ш., 15М (Выборгский)", type:"battery",
+    hours: "Ежедневно 09:00–22:00", note: "Сброс батареек — в зоне касс.",
+    lat:60.0642438, lng:30.3018049 },
+  { name: "«Перекрёсток»",
+    addr: "ул. Академика Байкова, 47 (Калининский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер у стойки информации.",
+    lat:60.0282626, lng:30.3728649 },
+  { name: "ТК (Озеро Долгое)",
+    addr: "Комендантский пр., 9 (Приморский)", type:"battery",
+    hours: "Ежедневно 09:00–22:00", note: "Контейнер для батареек у входа.",
+    lat:60.0056617, lng:30.2630198 },
+  { name: "«Магнит»",
+    addr: "пр. Народного Ополчения, 182 (Кировский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Эко-контейнер у входа.",
+    lat:59.8316886, lng:30.2515687 },
+  { name: "«Дикси»",
+    addr: "Волхонское ш., 29 (Красносельский)", type:"battery",
+    hours: "Ежедневно 08:00–23:00", note: "Контейнер для батареек у касс.",
+    lat:59.8249883, lng:30.0812691 }
+];
+
+const ICONS = {
+  battery:     { emoji:"🔋", label:"Батарейки",              preset:"islands#greenDotIcon",      cluster:"islands#invertedGreenClusterIcons" },
+  accumulator: { emoji:"🚗", label:"Аккумуляторы",           preset:"islands#orangeDotIcon",     cluster:"islands#invertedOrangeClusterIcons" },
+  both:        { emoji:"♻️", label:"Батарейки и аккумуляторы", preset:"islands#blueDotIcon",       cluster:"islands#invertedBlueClusterIcons" }
+};
+const TYPE_FILTER = { all:["battery","accumulator","both"], battery:["battery","both"], accumulator:["accumulator","both"] };
+
+const listEl   = document.getElementById("list");
+const searchEl = document.getElementById("search");
+const counterEl= document.getElementById("counter");
+let activeFilter="all", selectedIdx=null;
+let map, clusterer, placemarks={};   // заполняется в init()
+
+const words = s => s.toLowerCase().split(/\s+/).filter(Boolean);
+const matches = (p,q) => words(q).every(w => (p.name+" "+p.addr).toLowerCase().includes(w));
+
+function cardHtml(p,i){
+  const icon = ICONS[p.type].emoji;
+  const badges = (p.type==="both"
+      ? `<span class="tag">🔋 батарейки</span><span class="tag acc">🚗 аккумуляторы</span>`
+      : p.type==="battery" ? `<span class="tag">🔋 батарейки</span>` : `<span class="tag acc">🚗 аккумуляторы</span>`);
+  return `<h3>${icon} ${p.name}</h3><div class="addr">${p.addr}</div><div class="tags">${badges}</div>`;
+}
+
+function renderList(filteredIdx){
+  document.querySelectorAll(".point-card").forEach(c=>c.remove());
+  const empty=document.querySelector(".empty"); if(empty) empty.remove();
+  filteredIdx.forEach(i=>{
+    const p=POINTS[i];
+    const card=document.createElement("div");
+    card.className="point-card"; card.dataset.idx=i;
+    card.innerHTML=cardHtml(p,i);
+    card.onclick=()=> selectPoint(i,true);
+    listEl.appendChild(card);
+  });
+  if(!filteredIdx.length) listEl.insertAdjacentHTML("beforeend","<div class='empty'>Ничего не найдено.<br>Попробуйте изменить фильтр или запрос.</div>");
+  counterEl.textContent = `Найдено пунктов: ${filteredIdx.length} из ${POINTS.length}`;
+}
+
+function applyFilter(){
+  const q = searchEl.value.trim();
+  const allowed = TYPE_FILTER[activeFilter];
+  const idx=[]; POINTS.forEach((p,i)=>{ if(allowed.includes(p.type) && (!q || matches(p,q))) idx.push(i); });
+  renderList(idx);
+  if(map && clusterer){
+    clusterer.removeAll();
+    idx.forEach(i=>clusterer.add(placemarks[i]));
+    clusterer.options.set({ clusterIconsColor: "auto" });
+  }
+}
+
+function balloonHtml(p){
+  const t = ICONS[p.type].label.toLowerCase();
+  const routeUrl = `https://yandex.ru/maps/?rtext=~${p.lat}%2C${p.lng}&rtt=auto`;
+  return `<div class="popup">
+    <b>${p.name}</b><br>
+    <span style="color:#555">📍 ${p.addr}</span><br>
+    <span style="color:#555">🕘 ${p.hours}</span>
+    <div style="background:#fdf4e3;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:.9em">
+      Принимают: <b>${t}</b><br>${p.note||""}
+    </div>
+    <a href="${routeUrl}" target="_blank" rel="noopener" style="font-weight:600">🧭 Проложить маршрут</a>
+  </div>`;
+}
+
+function selectPoint(i, fly){
+  selectedIdx=i;
+  document.querySelectorAll(".point-card").forEach(c=>c.classList.toggle("selected", +c.dataset.idx===i));
+  const p=POINTS[i], pm=placemarks[i];
+  if(pm){
+    pm.balloon.open(pm.geometry.getCoordinates());
+    if(fly){
+      map.setCenter([p.lat,p.lng], 16, { duration:400, checkZoomRange:true });
+      if(window.innerWidth<=820) closeSidebar();
+    }
+  }
+  const card=document.querySelector(`.point-card[data-idx="${i}"]`);
+  if(card) card.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+
+document.querySelectorAll(".chip").forEach(ch=>{
+  ch.onclick=()=>{
+    document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+    ch.classList.add("active");
+    activeFilter=ch.dataset.f; applyFilter();
+  };
+});
+searchEl.addEventListener("input", applyFilter);
+
+const sidebar=document.getElementById("sidebar");
+function closeSidebar(){ sidebar.classList.remove("open"); }
+document.getElementById("burger").onclick=()=>sidebar.classList.add("open");
+document.getElementById("closeSide").onclick=closeSidebar;
+
+document.getElementById("fitBtn").onclick=()=>{
+  if(map && clusterer){
+    const bo = clusterer.getBounds();
+    if(bo) map.setBounds(bo,{checkZoomRange:true, zoomMargin:[40,40,40,40], duration:600});
+  }
+};
+
+/* ---------- Инициализация Яндекс.Карты ---------- */
+function init(){
+  map = new ymaps.Map("map", {
+    center:[59.93, 30.32],
+    zoom:10,
+    controls:["zoomControl","geolocationControl","typeSelector"],
+    type:"yandex#map"
+  }, { suppressMapOpenBlock:true });
+
+  map.behaviors.enable("dblClickZoom");
+
+  clusterer = new ymaps.Clusterer({
+    groupByCoordinates:false,
+    clusterDisableClickZoom:false,
+    clusterHideOnSingleClick:false,
+    gridSize:64,
+    hasBalloon:true
+  });
+
+  POINTS.forEach((p,i)=>{
+    const pm = new ymaps.Placemark([p.lat,p.lng], {
+      hintContent: p.name,
+      balloonContentHeader: `<b>${p.name}</b>`,
+      balloonContentBody: balloonHtml(p),
+      balloonContentFooter: p.addr
+    }, { preset: ICONS[p.type].preset, balloonOffset:[0,-38] });
+    placemarks[i]=pm;
+    clusterer.add(pm);
+  });
+  map.geoObjects.add(clusterer);
+
+  applyFilter();
+  document.getElementById("keyBanner").style.display="none";
+}
+
+/* ---------- Загрузка API ---------- */
+if(!YANDEX_API_KEY){
+  renderList(POINTS.map((_,i)=>i));
+  counterEl.textContent = `Пунктов в каталоге: ${POINTS.length}. Карта ожидает API-ключ.`;
+  document.getElementById("keyBanner").style.display="flex";
+} else {
+  const s=document.createElement("script");
+  s.src=`https://api-maps.yandex.ru/2.1/?apikey=${encodeURIComponent(YANDEX_API_KEY)}&lang=ru_RU`;
+  s.onload=()=>ymaps.ready(init);
+  s.onerror=()=>{
+    renderList(POINTS.map((_,i)=>i));
+    document.getElementById("keyBanner").style.display="flex";
+    counterEl.textContent="Не удалось загрузить Яндекс.Карты. Проверьте ключ и подключение.";
+  };
+  document.head.appendChild(s);
+}
+</script>
 </body>
 </html>
